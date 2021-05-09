@@ -14,7 +14,33 @@ public class GunManager : MonoBehaviour
 
     public int gunint = -1;
 
+    public Transform dropzone;
+
     public int currentGunint = 0;
+
+    public PickupDetector detector;
+
+    public void onNewPickup()
+    {
+        if(currentGunint == 0)
+        {
+            if (SecondGun != null)
+            {
+                Instantiate(SecondGun.DroppedPrefab, dropzone.transform.position, dropzone.transform.rotation);
+            }
+            SecondGun = detector.gunInVicinity;
+   
+        }
+        else if(currentGunint == 1)
+        {
+            if (CurGun != null)
+            {
+                Instantiate(CurGun.DroppedPrefab, dropzone.transform.position, dropzone.transform.rotation);
+            }
+            CurGun = detector.gunInVicinity;
+        
+        }
+    }
     private void Start()
     {
         for (int i = 0; i < guns.Length; i++)
@@ -40,27 +66,97 @@ public class GunManager : MonoBehaviour
         {
             if (currentGunint == 0)
             {
-                currentGunint++;
+                if(SecondGun == null)
+                {
+                    return;
+                }
+                else
+                {
+                    currentGunint++;
+                }
             }
             else
             {
-                currentGunint = 0;
+                if (CurGun == null)
+                {
+                    return;
+                }
+                else
+                {
+                    currentGunint = 0;
+                }
+            }
+            weaponChange();
+
+        }
+        else if(Input.GetAxis("Mouse ScrollWheel") <0) {
+            if(currentGunint == 1)
+            {
+                if (CurGun == null)
+                {
+                    return;
+                }
+                else
+                {
+                    currentGunint--;
+                }
+            }
+            else
+            {
+                if (SecondGun == null)
+                {
+                    return;
+                }
+                else
+                {
+                    currentGunint = 1;
+                }
             }
             weaponChange();
         }
-        else if(Input.GetAxis("Mouse ScrollWheel") <0) {
-            currentGunint--;
-            weaponChange();
-            if(currentGunint == 1)
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            DropWeapon();
+        }    
+    }
+    void DropWeapon()
+    {
+        if (CurGun && SecondGun != null)
+        {
+            if (currentGunint == 0)
             {
-                currentGunint--;
+                Instantiate(CurGun.DroppedPrefab, dropzone.transform.position, dropzone.transform.rotation);
+                CurGun = null;
+                currentGunint = 1;
+                gunint = 0;
+                var instantiatedGun = Instantiate(SecondGun.Prefab, gunTransforms[gunint].position, gunTransforms[gunint].rotation);
+                instantiatedGun.transform.SetParent(this.transform);
+                instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
+                instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
+                Destroy(currentGunOBJ);
+                currentGunOBJ = instantiatedGun;
             }
             else
             {
-                currentGunint = 1;
+
+                Instantiate(SecondGun.DroppedPrefab, dropzone.transform.position, dropzone.transform.rotation);
+                SecondGun = null;
+                currentGunint = 0;
+                gunint = 1;
+                var instantiatedGun = Instantiate(CurGun.Prefab, gunTransforms[gunint].position, gunTransforms[gunint].rotation);
+                instantiatedGun.transform.SetParent(this.transform);
+                instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
+                instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
+                Destroy(currentGunOBJ);
+                currentGunOBJ = instantiatedGun;
             }
         }
     }
+
     void weaponChange()
     {
         if(currentGunint == 0)
@@ -79,7 +175,6 @@ public class GunManager : MonoBehaviour
             instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
             Destroy(currentGunOBJ);
             currentGunOBJ = instantiatedGun;
-            print(gunTransforms[gunint].position);
         }
         else if(currentGunint >0)
         {
@@ -97,7 +192,7 @@ public class GunManager : MonoBehaviour
             instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
             Destroy(currentGunOBJ);
             currentGunOBJ = instantiatedGun;
-            print(gunTransforms[gunint].position);
         }
     }
+
 }

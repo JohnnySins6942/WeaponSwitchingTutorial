@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: AK74
   m_EditorClassIdentifier: 
   Prefab: {fileID: 1487774384131766, guid: ee329c3cd08e58645834d20702d7f6c6, type: 3}
+  DroppedPrefab: {fileID: 581530170569772584, guid: 5697ce3a204b8584e89de6812ee97894, type: 3}
+  name: Ak47

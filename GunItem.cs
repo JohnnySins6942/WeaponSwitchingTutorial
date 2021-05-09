@@ -6,4 +6,6 @@ using UnityEngine;
 public class GunItem : ScriptableObject
 {
     public GameObject Prefab;
+    public GameObject DroppedPrefab;
+    public new string name;
 }
