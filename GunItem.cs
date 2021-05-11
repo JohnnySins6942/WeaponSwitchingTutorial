@@ -7,5 +7,6 @@ public class GunItem : ScriptableObject
 {
     public GameObject Prefab;
     public GameObject DroppedPrefab;
+    public Sprite gunIcon;
     public new string name;
 }

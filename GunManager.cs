@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GunManager : MonoBehaviour
 {
@@ -19,6 +21,9 @@ public class GunManager : MonoBehaviour
     public int currentGunint = 0;
 
     public PickupDetector detector;
+
+    public Image CurWepImage, SecondWepImage;
+    public TextMeshProUGUI curWepName, SecondWepName;
 
     public void onNewPickup()
     {
@@ -40,9 +45,34 @@ public class GunManager : MonoBehaviour
             CurGun = detector.gunInVicinity;
         
         }
+        if (CurGun != null)
+        {
+            CurWepImage.enabled = true;
+            CurWepImage.sprite = CurGun.gunIcon;
+            curWepName.text = CurGun.name;
+        }
+        else
+        {
+            CurWepImage.enabled = false;
+            curWepName.text = "no weapon";
+        }
+        if (SecondGun != null)
+        {
+            SecondWepImage.enabled = true;
+            SecondWepImage.sprite = SecondGun.gunIcon;
+            SecondWepName.text = SecondGun.name;
+        }
+        else
+        {
+            SecondWepImage.enabled = false;
+            SecondWepImage.sprite = null;
+            SecondWepName.text = "no weapon";
+        }
     }
     private void Start()
     {
+        Load();
+
         for (int i = 0; i < guns.Length; i++)
         {
             if(CurGun == guns[i])
@@ -51,13 +81,105 @@ public class GunManager : MonoBehaviour
                 break;
             }
         }
-        var instantiatedGun = Instantiate(CurGun.Prefab,gunTransforms[gunint].position, gunTransforms[gunint].rotation);
-        instantiatedGun.transform.SetParent(this.transform);
-        instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
-        instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
-        Destroy(currentGunOBJ);
-        currentGunOBJ = instantiatedGun;
+        if (CurGun != null)
+        {
+            var instantiatedGun = Instantiate(CurGun.Prefab, gunTransforms[gunint].position, gunTransforms[gunint].rotation);
+            instantiatedGun.transform.SetParent(this.transform);
+            instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
+            instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
+            Destroy(currentGunOBJ);
+            currentGunOBJ = instantiatedGun;
+        }
+        else
+        {
+            var instantiatedGun = Instantiate(SecondGun.Prefab, gunTransforms[gunint].position, gunTransforms[gunint].rotation);
+            instantiatedGun.transform.SetParent(this.transform);
+            instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
+            instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
+            Destroy(currentGunOBJ);
+            currentGunOBJ = instantiatedGun;
+        }
+        if (CurGun != null)
+        {
+            CurWepImage.enabled = true;
+            CurWepImage.sprite = CurGun.gunIcon;
+            curWepName.text = CurGun.name;
+        }
+        else
+        {
+            CurWepImage.enabled = false;
+            curWepName.text = "no weapon";
+        }
+        if (SecondGun != null)
+        {
+            SecondWepImage.enabled = true;
+            SecondWepImage.sprite = SecondGun.gunIcon;
+            SecondWepName.text = SecondGun.name;
+        }
+        else
+        {
+            SecondWepImage.enabled = false;
+            SecondWepImage.sprite = null;
+            SecondWepName.text = "no weapon";
+        }
        
+       
+    }
+
+    private void OnApplicationQuit()
+    {
+        Save();
+    }
+
+    void Save()
+    {
+        for (int i = 0; i < guns.Length; i++)
+        {
+            if(guns[i] == CurGun)
+            {
+                PlayerPrefs.SetInt("curGunIndex", i);
+            }
+        }
+        if(CurGun == null)
+        {
+            PlayerPrefs.SetInt("curGunIndex", -1);
+        }
+        for (int j = 0; j < guns.Length; j++)
+        {
+            if (guns[j] == SecondGun)
+            {
+                PlayerPrefs.SetInt("secondaryGunIndex", j);
+            }
+        }
+        if (SecondGun == null)
+        {
+            PlayerPrefs.SetInt("secondaryGunIndex", -1);
+        }
+    }
+    void Load()
+    {
+        if (PlayerPrefs.HasKey("curGunIndex"))
+        {
+            if (PlayerPrefs.GetInt("curGunIndex") > -1)
+            {
+                CurGun = guns[PlayerPrefs.GetInt("curGunIndex")];
+            }
+            else
+            {
+                CurGun = null;
+            }
+        }
+        if (PlayerPrefs.HasKey("secondaryGunIndex"))
+        {
+            if (PlayerPrefs.GetInt("secondaryGunIndex") > -1)
+            {
+                SecondGun = guns[PlayerPrefs.GetInt("secondaryGunIndex")];
+            }
+            else
+            {
+                SecondGun = null;
+            }
+        }
     }
 
     private void LateUpdate()
@@ -138,6 +260,29 @@ public class GunManager : MonoBehaviour
                 instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
                 instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
                 Destroy(currentGunOBJ);
+                if (CurGun != null)
+                {
+                    CurWepImage.enabled = true;
+                    CurWepImage.sprite = CurGun.gunIcon;
+                    curWepName.text = CurGun.name;
+                }
+                else
+                {
+                    CurWepImage.enabled = false;
+                    curWepName.text = "no weapon";
+                }
+                if (SecondGun != null)
+                {
+                    SecondWepImage.enabled = true;
+                    SecondWepImage.sprite = SecondGun.gunIcon;
+                    SecondWepName.text = SecondGun.name;
+                }
+                else
+                {
+                    SecondWepImage.enabled = false;
+                    SecondWepImage.sprite = null;
+                    SecondWepName.text = "no weapon";
+                }
                 currentGunOBJ = instantiatedGun;
             }
             else
@@ -151,6 +296,29 @@ public class GunManager : MonoBehaviour
                 instantiatedGun.transform.SetParent(this.transform);
                 instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
                 instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
+                if (CurGun != null)
+                {
+                    CurWepImage.enabled = true;
+                    CurWepImage.sprite = CurGun.gunIcon;
+                    curWepName.text = CurGun.name;
+                }
+                else
+                {
+                    CurWepImage.enabled = false;
+                    curWepName.text = "no weapon";
+                }
+                if (SecondGun != null)
+                {
+                    SecondWepImage.enabled = true;
+                    SecondWepImage.sprite = SecondGun.gunIcon;
+                    SecondWepName.text = SecondGun.name;
+                }
+                else
+                {
+                    SecondWepImage.enabled = false;
+                    SecondWepImage.sprite = null;
+                    SecondWepName.text = "no weapon";
+                }
                 Destroy(currentGunOBJ);
                 currentGunOBJ = instantiatedGun;
             }
@@ -174,6 +342,29 @@ public class GunManager : MonoBehaviour
             instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
             instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
             Destroy(currentGunOBJ);
+            if (CurGun != null)
+            {
+                CurWepImage.enabled = true;
+                CurWepImage.sprite = CurGun.gunIcon;
+                curWepName.text = CurGun.name;
+            }
+            else
+            {
+                CurWepImage.enabled = false;
+                curWepName.text = "no weapon";
+            }
+            if (SecondGun != null)
+            {
+                SecondWepImage.enabled = true;
+                SecondWepImage.sprite = SecondGun.gunIcon;
+                SecondWepName.text = SecondGun.name;
+            }
+            else
+            {
+                SecondWepImage.enabled = false;
+                SecondWepImage.sprite = null;
+                SecondWepName.text = "no weapon";
+            }
             currentGunOBJ = instantiatedGun;
         }
         else if(currentGunint >0)
@@ -191,6 +382,29 @@ public class GunManager : MonoBehaviour
             instantiatedGun.transform.localPosition = gunTransforms[gunint].position;
             instantiatedGun.transform.localRotation = gunTransforms[gunint].rotation;
             Destroy(currentGunOBJ);
+            if (CurGun != null)
+            {
+                CurWepImage.enabled = true;
+                CurWepImage.sprite = CurGun.gunIcon;
+                curWepName.text = CurGun.name;
+            }
+            else
+            {
+                CurWepImage.enabled = false;
+                curWepName.text = "no weapon";
+            }
+            if (SecondGun != null)
+            {
+                SecondWepImage.enabled = true;
+                SecondWepImage.sprite = SecondGun.gunIcon;
+                SecondWepName.text = SecondGun.name;
+            }
+            else
+            {
+                SecondWepImage.enabled = false;
+                SecondWepImage.sprite = null;
+                SecondWepName.text = "no weapon";
+            }
             currentGunOBJ = instantiatedGun;
         }
     }
